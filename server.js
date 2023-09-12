@@ -3,11 +3,12 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended : true}));
 
+
 const MongoClient = require('mongodb').MongoClient
 app.set('vew engine', 'ejs')
 
 var db;
-MongoClient.connect('mongodb+srv://sparta:aaaa4321@cluster0.mcun02k.mongodb.net/?retryWrites=true&w=majority', function(에러, client){
+MongoClient.connect('mongodb+srv://sparta:aaaa4321@cluster0.mcun02k.mongodb.net/?retryWrites=true&w=majority',{ useUnifiedTopology: true }, function(에러, client){
     if (에러) return console.log(에러);
     //서버띄우는 코드 여기로 옮기기
 
@@ -62,6 +63,7 @@ app.get('/list', function(요청, 응답){
         console.log(결과);
         응답.render('list.ejs', {posts: 결과});
     });
+  })
 
 
 app.delete('/delete', function(요청, 응답){
@@ -76,5 +78,17 @@ app.delete('/delete', function(요청, 응답){
 
 })
 
+// /detail로 접속하면 detail.ejs로 보여줌
 
+app.get('/detail/:id', function(req, res){
+  db.collection('post').findOne({ _id : parseInt(req.params.id) }, function(err, result){
+    if (err) {
+      console.error(err);
+      // 에러 처리 코드 추가
+      res.status(500).send("Internal Server Error");
+    } else {
+      console.log(result);
+      res.render('detail.ejs', { data: result });
+    }
+  });
 });
